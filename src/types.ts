@@ -96,10 +96,20 @@ export interface UserPresence {
 
 export type UserRole = 'client' | 'manager';
 
+export interface StaffingRequirement {
+  role: string;
+  junior: number;
+  middle: number;
+  senior: number;
+}
+
 export interface SpecRequest {
   id: string;
   title: string;
-  description: string;
+  description?: string;
+  staffing: StaffingRequirement[];
+  competencies: string;
+  deadline: string;
   createdBy: string;
   createdByColor: string;
   createdAt: number;
