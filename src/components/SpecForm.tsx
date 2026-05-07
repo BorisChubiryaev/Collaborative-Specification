@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { FormData, Cluster, Contract, SpecificationItem, Stage, FunctionalRequirement, Employee, FieldFlag } from '../types';
+import { FormData, Cluster, Contract, SpecificationItem, Stage, FunctionalRequirement, Employee, FieldFlag, SpecRequest } from '../types';
 
 const STEPS = [
   'Jira ссылка',
@@ -24,6 +24,7 @@ interface Props {
   onFocusField: (fieldId: string | null) => void;
   onAddFlag: (fieldId: string, stepIndex: number, type: 'error' | 'warning' | 'info', comment: string) => void;
   otherUsersPresence: { userId: string; userName: string; userColor: string; activeField: string | null }[];
+  requestInfo?: SpecRequest | null;
 }
 
 // ── Flag dot indicator — defined OUTSIDE main component ──
@@ -395,6 +396,7 @@ export default function SpecForm({
   onFocusField,
   onAddFlag,
   otherUsersPresence,
+  requestInfo,
 }: Props) {
   const [expandedClusters, setExpandedClusters] = useState<number[]>([]);
   const [expandedSpecItems, setExpandedSpecItems] = useState<number[]>([]);
@@ -722,8 +724,106 @@ export default function SpecForm({
   return (
     <div className="flex gap-5">
       {/* ── Step Sidebar ── */}
-      <div className="w-52 flex-shrink-0">
+      <div className="w-52 flex-shrink-0 space-y-4">
         <StepSidebar currentStep={currentStep} onStepChange={onStepChange} formData={formData} flags={activeFlags} />
+
+        {/* ── Request info card ── */}
+        {requestInfo && (
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0">
+                <svg className="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <h3 className="font-semibold text-gray-800 text-sm">Запрос заказчика</h3>
+            </div>
+
+            {/* Title */}
+            <div className="mb-3">
+              <div className="text-xs text-gray-400 mb-0.5">Название</div>
+              <div className="text-xs font-medium text-gray-800 leading-snug">{requestInfo.title}</div>
+            </div>
+
+            {/* Client */}
+            <div className="mb-3">
+              <div className="text-xs text-gray-400 mb-0.5">Заказчик</div>
+              <div className="flex items-center gap-1.5">
+                <div
+                  className="w-4 h-4 rounded-full flex items-center justify-center text-white text-[8px] font-bold flex-shrink-0"
+                  style={{ backgroundColor: requestInfo.createdByColor }}
+                >
+                  {requestInfo.createdBy[0]}
+                </div>
+                <span className="text-xs text-gray-700">{requestInfo.createdBy}</span>
+              </div>
+            </div>
+
+            {/* Staffing */}
+            {requestInfo.staffing.length > 0 && (
+              <div className="mb-3">
+                <div className="text-xs text-gray-400 mb-1.5">Потребность в сотрудниках</div>
+                <div className="space-y-1.5">
+                  {requestInfo.staffing.map((s, idx) => {
+                    const total = s.junior + s.middle + s.senior;
+                    return (
+                      <div key={idx} className="bg-gray-50 rounded-lg px-2.5 py-2">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs font-medium text-gray-700 truncate">{s.role || 'Роль'}</span>
+                          <span className="text-xs font-bold text-blue-600 flex-shrink-0 ml-1">{total}</span>
+                        </div>
+                        <div className="flex gap-2 text-[10px] text-gray-500">
+                          <span>J: <span className={s.junior > 0 ? 'text-green-600 font-semibold' : ''}>{s.junior}</span></span>
+                          <span>M: <span className={s.middle > 0 ? 'text-green-600 font-semibold' : ''}>{s.middle}</span></span>
+                          <span>S: <span className={s.senior > 0 ? 'text-green-600 font-semibold' : ''}>{s.senior}</span></span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Competencies */}
+            {requestInfo.competencies && (
+              <div className="mb-3">
+                <div className="text-xs text-gray-400 mb-0.5">Компетенции</div>
+                <div className="flex flex-wrap gap-1">
+                  {requestInfo.competencies.split(/[,;]+/).filter(Boolean).map((skill, idx) => (
+                    <span key={idx} className="text-[10px] bg-blue-50 text-blue-700 rounded-md px-1.5 py-0.5 border border-blue-100">
+                      {skill.trim()}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Deadline */}
+            {requestInfo.deadline && (
+              <div className="mb-3">
+                <div className="text-xs text-gray-400 mb-0.5">Срок выполнения</div>
+                <div className="flex items-center gap-1.5">
+                  <svg className="w-3.5 h-3.5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <span className="text-xs font-medium text-gray-700">
+                    {new Date(requestInfo.deadline).toLocaleDateString('ru-RU', {
+                      day: '2-digit', month: 'long', year: 'numeric',
+                    })}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Description */}
+            {requestInfo.description && (
+              <div>
+                <div className="text-xs text-gray-400 mb-0.5">Описание</div>
+                <div className="text-xs text-gray-600 leading-snug">{requestInfo.description}</div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* ── Form content ── */}
