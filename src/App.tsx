@@ -301,6 +301,24 @@ export default function App() {
             Сбросить
           </button>
 
+          {/* Clear all data */}
+          <button
+            onClick={() => {
+              if (window.confirm('Удалить ВСЕ локальные данные? Это очистит заявки, шаблоны, чат и форму. Действие необратимо.')) {
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.reload();
+              }
+            }}
+            className="hidden sm:flex items-center gap-1 rounded-lg border border-gray-200 px-2.5 py-1.5 text-xs text-gray-600 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200 transition-all"
+            title="Очистить все локальные данные"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            Очистить
+          </button>
+
           {/* Logout */}
           <button
             onClick={handleLogout}
@@ -350,6 +368,7 @@ export default function App() {
               onFocusField={handleFocusField}
               onAddFlag={collab.addFlag}
               otherUsersPresence={otherUsersPresence}
+              requestInfo={request}
             />
           </div>
         </div>
