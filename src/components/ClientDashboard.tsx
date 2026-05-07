@@ -300,9 +300,9 @@ export default function ClientDashboard({ userName, userColor, onEnterSession }:
                         <thead >
                           <tr className="text-gray-500 text-[10px] uppercase tracking-wider">
                             <th className="pb-2 pl-1 font-medium">Роль</th >
-                            <th className="pb-2 text-center font-medium">J</th >
-                            <th className="pb-2 text-center font-medium">M</th >
-                            <th className="pb-2 text-center font-medium">S</th >
+                            <th className="pb-2 text-center font-medium">Junior</th >
+                            <th className="pb-2 text-center font-medium">Middle</th >
+                            <th className="pb-2 text-center font-medium">Senior</th >
                             <th className="pb-2 text-right pr-1 font-medium"></th >
                           </tr >
                         </thead >
